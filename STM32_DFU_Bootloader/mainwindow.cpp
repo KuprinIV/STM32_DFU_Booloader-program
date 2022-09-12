@@ -100,10 +100,13 @@ void MainWindow::onBootOperationFinished(void)
             break;
 
         case DFU_Bootloader::READ_FW_DATA:
-            hex_parser = new hexParser(outHexFileName, true);
-            // start saving hex file task
-            saveReadHexFile = QtConcurrent::run(&hexParser::createHexFile, hex_parser, &hexFileData, outHexFileName);
-            saveHexFileWatcher.setFuture(saveReadHexFile);
+            if(!hexFileData.isEmpty())
+            {
+                hex_parser = new hexParser(outHexFileName, true);
+                // start saving hex file task
+                saveReadHexFile = QtConcurrent::run(&hexParser::createHexFile, hex_parser, &hexFileData, outHexFileName);
+                saveHexFileWatcher.setFuture(saveReadHexFile);
+            }
             break;
 
         case DFU_Bootloader::LEAVE_DFU_MODE:
