@@ -37,12 +37,16 @@ CONFIG += embed_translations
 INCLUDEPATH += $$PWD/Libs/Includes/
 DEPENDPATH += $$PWD/Libs/Includes/
 
-LIBS += -L$$PWD/Libs/Src/ -llibusb-1.0
+win32-g++: LIBS += -L$$PWD/Libs/Src/MinGW/ -llibusb-1.0
+win32-msvc: LIBS += -L$$PWD/Libs/Src/MSVC/ -llibusb-1.0
 
 CONFIG(release, debug|release) {
     DESTDIR = release_output
-    win32 {
-        QMAKE_POST_LINK += windeployqt $$OUT_PWD/$$DESTDIR
+    win32-g++ {
+        QMAKE_POST_LINK += C:\Qt\6.2.3\mingw_64\bin\windeployqt $$OUT_PWD/$$DESTDIR
+    }
+    win32-msvc {
+        QMAKE_POST_LINK += C:\Qt\6.2.3\msvc2019_64\bin\windeployqt --pdb $$OUT_PWD/$$DESTDIR
     }
 }
 
