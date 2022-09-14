@@ -46,7 +46,7 @@ CONFIG(release, debug|release) {
         QMAKE_POST_LINK += C:\Qt\6.2.3\mingw_64\bin\windeployqt $$OUT_PWD/$$DESTDIR
     }
     win32-msvc {
-        QMAKE_POST_LINK += C:\Qt\6.2.3\msvc2019_64\bin\windeployqt --pdb $$OUT_PWD/$$DESTDIR
+        QMAKE_POST_LINK += C:\Qt\6.2.3\msvc2019_64\bin\windeployqt $$OUT_PWD/$$DESTDIR
     }
 }
 
