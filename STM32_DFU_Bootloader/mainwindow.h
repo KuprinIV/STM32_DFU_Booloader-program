@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QtConcurrent/QtConcurrent>
 #include "dfu_bootloader.h"
-#include "usb_devinfo.h"
 #include "hexparser.h"
 
 QT_BEGIN_NAMESPACE

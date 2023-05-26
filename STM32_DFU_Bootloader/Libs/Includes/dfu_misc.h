@@ -2,6 +2,7 @@
 #define DFU_MISC_H
 
 #include <QObject>
+#include "STM32_DFU_Bootloader_Lib_global.h"
 
 class DFU_Status
 {
@@ -30,7 +31,7 @@ public:
     int sector_type;
 };
 
-class DFU_TargetMemoryMap
+class STM32_DFU_BOOTLOADER_LIB_EXPORT DFU_TargetMemoryMap
 {
 public:
     DFU_TargetMemoryMap(){}
@@ -39,7 +40,7 @@ public:
     QList<DFU_FlashSector> sectorsMap;
 };
 
-class DFU_Attributes
+class STM32_DFU_BOOTLOADER_LIB_EXPORT DFU_Attributes
 {
 public:
     DFU_Attributes(){};

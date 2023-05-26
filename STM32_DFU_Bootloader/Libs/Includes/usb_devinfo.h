@@ -2,24 +2,16 @@
 #define USB_DEVINFO_H
 
 #include <QObject>
+#include "STM32_DFU_Bootloader_Lib_global.h"
 
-class USB_DevInfo : public QObject
+class STM32_DFU_BOOTLOADER_LIB_EXPORT USB_DevInfo : public QObject
 {
     Q_OBJECT
 public:
-    USB_DevInfo(ushort vid, ushort pid/*, QString name*/)
-    {
-        this->VID = vid;
-        this->PID = pid;
-    //    this->devName = name;
-    }
+    USB_DevInfo(ushort vid, ushort pid);
 
     ushort PID;
     ushort VID;
-//    QString devName;
-
-signals:
-
 };
 
 #endif // USB_DEVINFO_H

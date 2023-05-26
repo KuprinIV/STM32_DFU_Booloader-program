@@ -5,8 +5,9 @@
 #include <QMap>
 #include "dfu_ll.h"
 #include "usb_devinfo.h"
+#include "STM32_DFU_Bootloader_Lib_global.h"
 
-class DFU_Bootloader : public QObject
+class STM32_DFU_BOOTLOADER_LIB_EXPORT DFU_Bootloader : public QObject
 {
     Q_OBJECT
 public:

@@ -31,8 +31,15 @@ CONFIG += embed_translations
 INCLUDEPATH += $$PWD/Libs/Includes/
 DEPENDPATH += $$PWD/Libs/Includes/
 
-win32-g++: LIBS += -L$$PWD/Libs/Src/MinGW/ -lSTM32_DFU_Bootloader_Lib.dll
-win32-msvc: LIBS += -L$$PWD/Libs/Src/MSVC/ -lSTM32_DFU_Bootloader_Lib.dll
+win32-g++ {
+    LIBS += -L$$PWD/Libs/Src/MinGW/ -lSTM32_DFU_Bootloader_Lib
+    LIBS += -L$$PWD/Libs/Src/MinGW/ -llibusb-1.0
+}
+
+win32-msvc {
+    LIBS += -L$$PWD/Libs/Src/MSVC/ -lSTM32_DFU_Bootloader_Lib
+    LIBS += -L$$PWD/Libs/Src/MSVC/ -llibusb-1.0
+}
 
 CONFIG(release, debug|release) {
     DESTDIR = release_output
