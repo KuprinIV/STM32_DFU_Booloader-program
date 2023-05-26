@@ -9,21 +9,15 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    dfu_bootloader.cpp \
-    dfu_ll.cpp \
     hexparser.cpp \
     main.cpp \
     mainwindow.cpp \
     memorymapdialog.cpp
 
 HEADERS += \
-    dfu_bootloader.h \
-    dfu_ll.h \
-    dfu_misc.h \
     hexparser.h \
     mainwindow.h \
-    memorymapdialog.h \
-    usb_devinfo.h
+    memorymapdialog.h
 
 FORMS += \
     mainwindow.ui \
@@ -37,8 +31,8 @@ CONFIG += embed_translations
 INCLUDEPATH += $$PWD/Libs/Includes/
 DEPENDPATH += $$PWD/Libs/Includes/
 
-win32-g++: LIBS += -L$$PWD/Libs/Src/MinGW/ -llibusb-1.0
-win32-msvc: LIBS += -L$$PWD/Libs/Src/MSVC/ -llibusb-1.0
+win32-g++: LIBS += -L$$PWD/Libs/Src/MinGW/ -lSTM32_DFU_Bootloader_Lib.dll
+win32-msvc: LIBS += -L$$PWD/Libs/Src/MSVC/ -lSTM32_DFU_Bootloader_Lib.dll
 
 CONFIG(release, debug|release) {
     DESTDIR = release_output
