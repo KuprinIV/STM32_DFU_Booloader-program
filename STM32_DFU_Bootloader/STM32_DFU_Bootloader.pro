@@ -9,13 +9,11 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    hexparser.cpp \
     main.cpp \
     mainwindow.cpp \
     memorymapdialog.cpp
 
 HEADERS += \
-    hexparser.h \
     mainwindow.h \
     memorymapdialog.h
 

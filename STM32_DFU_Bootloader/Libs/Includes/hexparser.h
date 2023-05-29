@@ -2,7 +2,14 @@
 #define HEXPARSER_H
 #include <QFile>
 #include <QMap>
+#include <QtCore/qglobal.h>
+
 #define DEBUG
+#if defined(STM32_DFU_BOOTLOADER_LIB_LIBRARY)
+#  define STM32_DFU_BOOTLOADER_LIB_EXPORT Q_DECL_EXPORT
+#else
+#  define STM32_DFU_BOOTLOADER_LIB_EXPORT Q_DECL_IMPORT
+#endif
 /** @file
  *  @brief Содержит публичные методы для парсинга hex-файла
  *
@@ -12,16 +19,16 @@
 /**
  * @brief The hexParser class класс для парсинга .hex файлов
  */
-class hexParser
+class STM32_DFU_BOOTLOADER_LIB_EXPORT hexParser
 {
 public:
 
     hexParser(QString filePath, bool isWrite);
     ~hexParser();
     bool parseFile(QMap<int,QByteArray*>*);
-    bool isError = false;
     bool createHexFile(QMap<int,QByteArray*>* map, QString path);
     uint32_t getCheckSum();
+    uint32_t calcHexFileChecksum(QMap<int,QByteArray*>* map);
 
 
 private:
@@ -33,6 +40,7 @@ private:
     int HBYTEADDRESS;
     int pointer=0;
     int parsedCheckSum = 0;
+    bool isError = false;
 
     int numFromAsciiByte (uint8_t* b, int len);
     bool getByteSlice(QByteArray array, int  len, int pointer, uint8_t* out);
