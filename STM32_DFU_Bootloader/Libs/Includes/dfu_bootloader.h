@@ -3,9 +3,15 @@
 
 #include <QObject>
 #include <QMap>
+#include <QtCore/qglobal.h>
 #include "dfu_ll.h"
-#include "usb_devinfo.h"
-#include "STM32_DFU_Bootloader_Lib_global.h"
+#include "dfu_misc.h"
+
+#if defined(STM32_DFU_BOOTLOADER_LIB_LIBRARY)
+#  define STM32_DFU_BOOTLOADER_LIB_EXPORT Q_DECL_EXPORT
+#else
+#  define STM32_DFU_BOOTLOADER_LIB_EXPORT Q_DECL_IMPORT
+#endif
 
 class STM32_DFU_BOOTLOADER_LIB_EXPORT DFU_Bootloader : public QObject
 {
@@ -29,6 +35,9 @@ public:
         FIRMWARE_DATA_DOESNT_MATCH_TARGET = -11,
         CANT_READ_FLASH_MEMORY = -12,
         CANT_RESET_DFU_STATE = -13,
+        CANT_SEND_CHECKSUM = -14,
+        CANT_SAVE_FW_VERIFY_DATA = -15,
+        CANT_LOCK_FLASH_READ = -16,
     };
 
     enum DFU_BootloaderOperations : int
@@ -38,6 +47,7 @@ public:
         WRITE_FW_DATA,
         READ_FW_DATA,
         LEAVE_DFU_MODE,
+        LOCK_FLASH_MEMORY_READING
     };
 
     QList<USB_DevInfo*> GetUsbDevicesList(void);
@@ -50,6 +60,9 @@ public:
     void WriteFwData(int targetIndex, QMap<int, QByteArray*>* fw_data);
     void ReadFwData(int targetIndex, QMap<int, QByteArray*>* fw_data);
     void LeaveDfuMode(void);
+    /** extended bootloader functions */
+    void WriteEncryptedFwData(int targetIndex, QMap<int, QByteArray*>* fw_data, uint32_t checksum);
+    void LockFlashMemoryReading(void);
 
 signals:
     void sendError(ErrorCodes error_code);

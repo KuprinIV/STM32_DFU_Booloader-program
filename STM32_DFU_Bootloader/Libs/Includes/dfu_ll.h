@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include "libusb.h"
-#include "usb_devinfo.h"
 #include "dfu_misc.h"
 
 #define DFU_BMREQUEST               0x21
@@ -80,6 +79,10 @@ public:
     bool DFU_Erase(bool isMassErase, uint32_t pageAddress);
     bool DFU_ReadUnprotect(void);
     bool DFU_Leave(void);
+    /** extended DFU requests */
+    bool DFU_LockFlashRead(void);
+    bool DFU_SaveVerifyData(void);
+    bool DFU_SendChecksum(uint32_t checksum);
 
 private:
     // members
@@ -128,7 +131,11 @@ private:
         GET_STATUS = 0x03,              /**< Команда получения текущего состояния */
         DFU_CLRSTATUS = 0x04,           /**< Команда удаления текущего состояния (не использовать) */
         DFU_GETSTATE = 0x05,            /**< Команда получения набора состояний, включая предыдущую ошибку */
-        DFU_ABORT = 0x06,               /**< Команда прерывания предидущей операции (выхода из режимов DNLOAD и UPLOAD) */
+        DFU_ABORT = 0x06,               /**< Команда прерывания предыдущей операции (выхода из режимов DNLOAD и UPLOAD) */
+        /** extended DFU requests */
+        DFU_READ_LOCK = 0x07,           /**< Команда установки защиты flash-памяти от чтения */
+        DFU_SAVE_VERIFY_DATA = 0x0A,    /**< Команда сохранения чек-суммы и параметров образа прошивки */
+        DFU_SEND_CHECKSUM = 0x0B        /**< Команда передачи чек-суммы */
     };
     // functions
     bool controlTransfer(uint8_t requestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex, unsigned char *data, uint16_t wLength);

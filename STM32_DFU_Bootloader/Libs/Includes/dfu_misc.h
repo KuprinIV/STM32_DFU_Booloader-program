@@ -2,7 +2,13 @@
 #define DFU_MISC_H
 
 #include <QObject>
-#include "STM32_DFU_Bootloader_Lib_global.h"
+#include <QtCore/qglobal.h>
+
+#if defined(STM32_DFU_BOOTLOADER_LIB_LIBRARY)
+#  define STM32_DFU_BOOTLOADER_LIB_EXPORT Q_DECL_EXPORT
+#else
+#  define STM32_DFU_BOOTLOADER_LIB_EXPORT Q_DECL_IMPORT
+#endif
 
 class DFU_Status
 {
@@ -15,7 +21,7 @@ public:
     uint8_t iString;
 };
 
-class DFU_FlashSector
+class STM32_DFU_BOOTLOADER_LIB_EXPORT DFU_FlashSector
 {
 public:
     enum SectorType : uint8_t
@@ -54,6 +60,20 @@ public:
     uint16_t transferSize;
     uint16_t bcdDfuVersion;
     QList<DFU_TargetMemoryMap>* memoryMap;
+};
+
+class STM32_DFU_BOOTLOADER_LIB_EXPORT USB_DevInfo : public QObject
+{
+    Q_OBJECT
+public:
+    USB_DevInfo(ushort vid, ushort pid)
+    {
+        this->VID = vid;
+        this->PID = pid;
+    }
+
+    ushort PID;
+    ushort VID;
 };
 
 #endif // DFU_MISC_H

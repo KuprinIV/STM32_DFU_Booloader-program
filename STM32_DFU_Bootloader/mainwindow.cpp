@@ -3,7 +3,6 @@
 #include "memorymapdialog.h"
 #include <QHeaderView>
 #include <QFileDialog>
-#include "usb_devinfo.h"
 
 /**
  * @brief Class constructor
