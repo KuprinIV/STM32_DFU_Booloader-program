@@ -65,6 +65,7 @@ public:
     bool DFU_OpenDevice(USB_DevInfo *dev);
     bool DFU_CloseDevice(void);
     DFU_Attributes* DFU_GetAttributes(void);
+    bool DFU_GetDeviceName(QString* dev_name);
 
     // DFU commands
     bool DFU_Detach(uint16_t timeout);
@@ -142,6 +143,7 @@ private:
     DFU_Attributes* dfu_attrs = Q_NULLPTR;
     QList<DFU_TargetMemoryMap> getDeviceMemoryMap(QString flashDescStr);
     QList<DFU_TargetMemoryMap> memory_map;
+    QString deviceName = QString("");
 };
 
 #endif // DFU_LL_H

@@ -55,6 +55,7 @@ public:
     bool CloseDfuDevice(void);
     QString GetErrorDescription(ErrorCodes error_code);
     DFU_Attributes* GetDfuAttributes(void);
+    bool GetDfuDeviceName(QString* dev_name);
     // bootloader functions
     void EraseMemory(int targetIndex);
     void WriteFwData(int targetIndex, QMap<int, QByteArray*>* fw_data);

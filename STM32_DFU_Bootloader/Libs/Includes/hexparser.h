@@ -22,14 +22,13 @@
 class STM32_DFU_BOOTLOADER_LIB_EXPORT hexParser
 {
 public:
-
     hexParser(QString filePath, bool isWrite);
     ~hexParser();
     bool parseFile(QMap<int,QByteArray*>*);
     bool createHexFile(QMap<int,QByteArray*>* map, QString path);
+    bool is_Error();
     uint32_t getCheckSum();
     uint32_t calcHexFileChecksum(QMap<int,QByteArray*>* map);
-
 
 private:
     uint32_t checkSum=0;

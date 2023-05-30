@@ -324,7 +324,14 @@ void MainWindow::on_usbDevListRefreshBtn_clicked()
         ui->deviceListCB->clear();
         for(USB_DevInfo* dev : dfu_boot->GetUsbDevicesList())
         {
-            ui->deviceListCB->addItem(QString("VID: 0x%1; PID: 0x%2").arg(dev->VID, 4, 16, QChar('0')).arg(dev->PID, 4, 16, QChar('0')), QVariant::fromValue(dev));
+            // get device name
+            QString devName;
+            if(dfu_boot->OpenDfuDevice(dev))
+            {
+                if(!dfu_boot->GetDfuDeviceName(&devName)) devName = "";
+                dfu_boot->CloseDfuDevice();
+            }
+            ui->deviceListCB->addItem(QString("%1 (VID: 0x%2; PID: 0x%3)").arg(devName).arg(dev->VID, 4, 16, QChar('0')).arg(dev->PID, 4, 16, QChar('0')), QVariant::fromValue(dev));
         }
     }
 }
