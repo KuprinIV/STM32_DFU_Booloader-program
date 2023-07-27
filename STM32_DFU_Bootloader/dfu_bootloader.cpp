@@ -137,6 +137,10 @@ QString DFU_Bootloader::GetErrorDescription(ErrorCodes error_code)
         case CANT_RESET_DFU_STATE:
             description = tr("Can't reset DFU state");
             break;
+
+        case CANT_VERIFY:
+            description = tr("Can't send verify image command");
+            break;
     }
     return description;
 }
@@ -283,7 +287,7 @@ void DFU_Bootloader::WriteFwData(int targetIndex, QMap<int, QByteArray*>* fw_dat
         uint32_t block_size = block_data->length();
         uint16_t wBlockNum;
         uint16_t dataLength;
-        uint16_t dataOffset;
+        uint32_t dataOffset;
         // calc wBlockNum and data length
         while(currentAddress <  block_addr + block_size)
         {
@@ -438,6 +442,171 @@ void DFU_Bootloader::LeaveDfuMode(void)
     }
 
     emit operationProgressChanged(100);
+}
+
+/**
+ * @brief Perform device mass erase memory operation
+ * @param targetIndex: target memory index from device memory map (get from DFU_Attributes)
+ * @return none
+ */
+bool DFU_Bootloader::BtMassEraseMemory(uint32_t start_addr, uint32_t image_size)
+{
+    DFU_Status status;
+    bool result = false;
+    // send status and operation progress
+    emit operationProgressChanged(0);
+    emit sendStatus(tr("Erasing memory..."));
+
+    if(dfu_attributes == Q_NULLPTR)
+    {
+        emit sendError(CANT_ERASE_MEMORY);
+        return result;
+    }
+
+    // reset state to DFU_STATE_IDLE
+    bool res = dfu->DFU_Abort();
+    if(!res)
+    {
+        emit sendError(CANT_RESET_DFU_STATE);
+        return result;
+    }
+
+    res = dfu->DFU_SendTargetParams(start_addr, image_size);
+    if(res)
+    {
+        dfu->DFU_GetStatus(&status);
+    }
+    else
+    {
+        emit sendError(CANT_ERASE_MEMORY);
+        return result;
+    }
+
+    // send mass erase command
+    res = dfu->DFU_Erase(true, 0);
+    if(res)
+    {
+        res = dfu->DFU_GetStatus(&status);
+        if(!res || status.bState != DFU_STATE_DNLOAD_BUSY)
+        {
+            emit sendError(CANT_ERASE_MEMORY);
+        }
+        else
+        {
+            res = dfu->DFU_GetStatus(&status);
+            if(!res || (status.bState == DFU_STATE_ERROR && status.bStatus == DFU_ERROR_TARGET))
+            {
+                emit sendError(CANT_ERASE_MEMORY);
+            }
+            else if(status.bState == DFU_STATE_ERROR && status.bStatus == DFU_ERROR_VENDOR)
+            {
+                emit sendError(PROTECTED_MEMORY);
+            }
+            else
+            {
+                result = true;
+            }
+        }
+    }
+    else
+    {
+        emit sendError(CANT_ERASE_MEMORY);
+    }
+
+    // add sending DFU_Abort request for indication of delay of mass memory erasing process
+    res = dfu->DFU_Abort();
+    if(!res)
+    {
+        emit sendError(CANT_RESET_DFU_STATE);
+        return res;
+    }
+
+
+    // send status and operation progress
+    isTargetMemoryErased = true;
+    emit operationProgressChanged(100);
+    emit sendStatus(tr("Memory was erased succesfully"));
+
+    return result;
+}
+
+void DFU_Bootloader::WriteBtFwData(QMap<int, QByteArray*>* fw_data)
+{
+    uint8_t verify_res = 0;
+    if(dfu_attributes == Q_NULLPTR)
+    {
+        emit sendError(CANT_WRITE_DATA_TO_FLASH);
+        return;
+    }
+    // read firmware data containers
+    QList<int> fw_data_block_addresses = fw_data->keys();
+    // write data to target memory
+    uint32_t transferSize = dfu_attributes->transferSize;
+    uint32_t numOfTranferredBytes = 0;
+
+    for(int block_addr : fw_data_block_addresses)
+    {
+        uint32_t currentAddress = block_addr;
+        QByteArray* block_data = fw_data->value(block_addr);
+        uint32_t block_size = block_data->length();
+        uint16_t dataLength;
+        uint32_t dataOffset;
+
+        // erase flash memory if it hasn't erased yet
+        if(!BtMassEraseMemory(block_addr, block_size)) return;
+
+        // reset state to DFU_STATE_IDLE
+        bool res = dfu->DFU_Abort();
+        if(!res)
+        {
+            emit sendError(CANT_RESET_DFU_STATE);
+            return;
+        }
+        // send status and operation progress
+        emit operationProgressChanged(0);
+        emit sendStatus(tr("Program flash memory..."));
+
+        // write block data to flash
+        while(currentAddress <  block_addr + block_size)
+        {
+            // calc data length
+            dataLength = ((block_addr + block_size - currentAddress) >= transferSize) ? (transferSize) : (block_addr + block_size - currentAddress);
+            dataOffset = currentAddress - block_addr;
+            res = writeFlashData(0, (uint8_t*)block_data->data() + dataOffset, dataLength);
+            if(res)
+            {
+                currentAddress += dataLength;
+                numOfTranferredBytes += dataLength;
+                emit operationProgressChanged(100*(numOfTranferredBytes-1)/block_size);
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        emit operationProgressChanged(100);
+        emit sendStatus(tr("Flash memory was programmed succesfully"));
+
+        res = dfu->DFU_Verify(&verify_res);
+        if(res)
+        {
+           if(verify_res == 0)
+           {
+               emit sendStatus(tr("Verified succesfully"));
+           }
+           else
+           {
+               emit sendError(FIRMWARE_DATA_DOESNT_MATCH_TARGET);
+               return;
+           }
+        }
+        else
+        {
+            emit sendError(CANT_VERIFY);
+            return;
+        }
+    }
 }
 
 

@@ -350,6 +350,21 @@ bool DFU_LL::DFU_Leave(void)
     return DFU_Dnload(0, NULL, 0);
 }
 
+bool DFU_LL::DFU_SendTargetParams(uint32_t start_addr, uint32_t size)
+{
+    // form transfer data array
+    uint8_t data[8] = {0};
+    memcpy(data, &start_addr, 4);
+    memcpy(data+4, &size, 4);
+    // send request
+    return controlTransfer(LIBUSB_REQUEST_TYPE_VENDOR|LIBUSB_ENDPOINT_OUT, DFU_SEND_TARGET_PARAMS, 0, 0, data, sizeof(data));
+}
+
+bool DFU_LL::DFU_Verify(uint8_t* is_verified)
+{
+   return controlTransfer(LIBUSB_REQUEST_TYPE_VENDOR|LIBUSB_ENDPOINT_IN, DFU_VERIFY, 0, 0, is_verified, 1);
+}
+
 /** private functions */
 
 /**

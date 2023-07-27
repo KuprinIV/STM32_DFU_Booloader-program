@@ -247,18 +247,19 @@ void MainWindow::on_downloadBtn_clicked()
         showStatus(true, tr("Please select target"));
         return;
     }
-    QString hexPilePath = QFileDialog::getOpenFileName(this, tr("Open File"), tr("C:/Users"), "(*.hex)");
-    if(!hexPilePath.isEmpty())
+    QString hexFilePath = QFileDialog::getOpenFileName(this, tr("Open File"), tr("C:/Users"), "(*.hex *.bin)");
+    if(!hexFilePath.isEmpty())
     {
         hexFileData.clear();
-        hex_parser = new hexParser(hexPilePath, false);
+        hex_parser = new hexParser(hexFilePath, false);
         if(hex_parser->parseFile(&hexFileData))
         {
             // lock UI
             lockUI(true);
             // start program firmware data task
             currentOperation = DFU_Bootloader::WRITE_FW_DATA;
-            bootOpreation = QtConcurrent::run(&DFU_Bootloader::WriteFwData, dfu_boot, targetIndex, &hexFileData);
+//            bootOpreation = QtConcurrent::run(&DFU_Bootloader::WriteFwData, dfu_boot, targetIndex, &hexFileData);
+            bootOpreation = QtConcurrent::run(&DFU_Bootloader::WriteBtFwData, dfu_boot, &hexFileData);
             bootOperationWatcher.setFuture(bootOpreation);
         }
         else

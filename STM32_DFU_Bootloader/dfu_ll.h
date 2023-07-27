@@ -80,6 +80,8 @@ public:
     bool DFU_Erase(bool isMassErase, uint32_t pageAddress);
     bool DFU_ReadUnprotect(void);
     bool DFU_Leave(void);
+    bool DFU_SendTargetParams(uint32_t start_addr, uint32_t size);
+    bool DFU_Verify(uint8_t *is_verified);
 
 private:
     // members
@@ -128,7 +130,9 @@ private:
         GET_STATUS = 0x03,              /**< Команда получения текущего состояния */
         DFU_CLRSTATUS = 0x04,           /**< Команда удаления текущего состояния (не использовать) */
         DFU_GETSTATE = 0x05,            /**< Команда получения набора состояний, включая предыдущую ошибку */
-        DFU_ABORT = 0x06,               /**< Команда прерывания предидущей операции (выхода из режимов DNLOAD и UPLOAD) */
+        DFU_ABORT = 0x06,               /**< Команда прерывания предsдущей операции (выхода из режимов DNLOAD и UPLOAD) */
+        DFU_SEND_TARGET_PARAMS = 0x0A,
+        DFU_VERIFY = 0x0B,
     };
     // functions
     bool controlTransfer(uint8_t requestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex, unsigned char *data, uint16_t wLength);

@@ -28,6 +28,7 @@ public:
         FIRMWARE_DATA_DOESNT_MATCH_TARGET = -11,
         CANT_READ_FLASH_MEMORY = -12,
         CANT_RESET_DFU_STATE = -13,
+        CANT_VERIFY = -14,
     };
 
     enum DFU_BootloaderOperations : int
@@ -49,6 +50,9 @@ public:
     void WriteFwData(int targetIndex, QMap<int, QByteArray*>* fw_data);
     void ReadFwData(int targetIndex, QMap<int, QByteArray*>* fw_data);
     void LeaveDfuMode(void);
+
+    bool BtMassEraseMemory(uint32_t start_addr, uint32_t image_size);
+    void WriteBtFwData(QMap<int, QByteArray*>* fw_data);
 
 signals:
     void sendError(ErrorCodes error_code);

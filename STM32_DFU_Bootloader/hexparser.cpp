@@ -12,6 +12,8 @@ hexParser::hexParser(QString filePath, bool isWrite)
 #endif
     }
 
+    isBin = filePath.endsWith(".bin");
+
     if(!isWrite)
     {
         if (!file->open(QIODevice::ReadOnly))
@@ -38,6 +40,7 @@ hexParser::~hexParser()
 void hexParser::init()
 {
     bArray = file->readAll();
+    if(isBin) return;
     if (bArray.at(0)!=':')
     {
         qDebug() <<"IncorrectFile";
@@ -240,6 +243,13 @@ bool hexParser::parseFile(QMap <int,QByteArray*>* map)
 
     int last_address = 0;
     int current_address = 0;
+
+    if(isBin)
+    {
+        map->insert(0x10000, &bArray);
+        return true;
+    }
+
     while (getNextLine(&address,data, &len))
     {
         if ((last_address+len) != address)
