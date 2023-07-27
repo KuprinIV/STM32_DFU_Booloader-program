@@ -32,8 +32,15 @@ private slots:
     void on_memoryMapTable_cellClicked(int row, int column);
     void on_memoryMapTable_cellDoubleClicked(int row, int column);
     void on_usbDevListRefreshBtn_clicked();
+    void on_stm32targetRB_clicked(bool checked);
+    void on_esp32targetRB_clicked(bool checked);
 
 private:
+    enum DFU_TargetDevice
+    {
+        STM32_DFU,
+        ESP32_DFU
+    };
     // members
     Ui::MainWindow *ui;
     DFU_Bootloader *dfu_boot;
@@ -49,6 +56,7 @@ private:
 
     bool isDfuDeviceOpened = false;
     int targetIndex = -1;
+    DFU_TargetDevice currentTargetDev = STM32_DFU;
 
     // functions
     void fillMemoryMapTable(QList<DFU_TargetMemoryMap> *map);

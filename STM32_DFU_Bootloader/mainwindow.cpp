@@ -247,18 +247,29 @@ void MainWindow::on_downloadBtn_clicked()
         showStatus(true, tr("Please select target"));
         return;
     }
-    QString hexPilePath = QFileDialog::getOpenFileName(this, tr("Open File"), tr("C:/Users"), "(*.hex)");
-    if(!hexPilePath.isEmpty())
+    QString hexFilePath = QFileDialog::getOpenFileName(this, tr("Open File"), tr("C:/Users"), "(*.hex *.bin)");
+    if(!hexFilePath.isEmpty())
     {
         hexFileData.clear();
-        hex_parser = new hexParser(hexPilePath, false);
+        hex_parser = new hexParser(hexFilePath, false);
         if(hex_parser->parseFile(&hexFileData))
         {
             // lock UI
             lockUI(true);
             // start program firmware data task
             currentOperation = DFU_Bootloader::WRITE_FW_DATA;
-            bootOpreation = QtConcurrent::run(&DFU_Bootloader::WriteFwData, dfu_boot, targetIndex, &hexFileData);
+            if(currentTargetDev == STM32_DFU)
+            {
+                bootOpreation = QtConcurrent::run(&DFU_Bootloader::WriteFwData, dfu_boot, targetIndex, &hexFileData);
+            }
+            else if(currentTargetDev == ESP32_DFU)
+            {
+                bootOpreation = QtConcurrent::run(&DFU_Bootloader::WriteBtFwData, dfu_boot, &hexFileData);
+            }
+            else
+            {
+                showStatus(true, tr("Target device isn't selected"));
+            }
             bootOperationWatcher.setFuture(bootOpreation);
         }
         else
@@ -337,6 +348,42 @@ void MainWindow::on_usbDevListRefreshBtn_clicked()
 }
 
 /**
+ * @brief STM32 target radio button checked event handling slot
+ * @param checked: true - radio button is checked, false - radio button isn't checked
+ * @return None
+ */
+void MainWindow::on_stm32targetRB_clicked(bool checked)
+{
+    if(checked)
+    {
+        ui->esp32targetRB->setChecked(false);
+        if(isDfuDeviceOpened)
+        {
+            dfu_boot->SelectTarget(0);
+            currentTargetDev = STM32_DFU;
+        }
+    }
+}
+
+/**
+ * @brief ESP32 target radio button checked event handling slot
+ * @param checked: true - radio button is checked, false - radio button isn't checked
+ * @return None
+ */
+void MainWindow::on_esp32targetRB_clicked(bool checked)
+{
+    if(checked)
+    {
+        ui->stm32targetRB->setChecked(false);
+        if(isDfuDeviceOpened)
+        {
+            dfu_boot->SelectTarget(1);
+            currentTargetDev = ESP32_DFU;
+        }
+    }
+}
+
+/**
  * @brief Fill device memory map table in main window
  * @param map: device memory map, got from DFU_Attributes
  */
@@ -396,6 +443,7 @@ void MainWindow::lockUI(bool isDevListDisabled)
     ui->uploadBtn->setEnabled(false);
     ui->eraseBtn->setEnabled(false);
     ui->returnBtn->setEnabled(false);
+    ui->selectTargetGB->setEnabled(!isDevListDisabled);
 }
 
 /**
@@ -406,14 +454,15 @@ void MainWindow::unlockUI(void)
     if(dfu_attrs != Q_NULLPTR)
     {
         ui->downloadBtn->setEnabled(dfu_attrs->isCanDnload);
-        ui->uploadBtn->setEnabled(dfu_attrs->isCanUpload);
+        ui->uploadBtn->setEnabled(dfu_attrs->isCanUpload && currentTargetDev == STM32_DFU);
     }
     else
     {
         ui->downloadBtn->setEnabled(true);
-        ui->uploadBtn->setEnabled(true);
+        ui->uploadBtn->setEnabled(currentTargetDev == STM32_DFU);
     }
     ui->deviceListCB->setEnabled(true);
-    ui->eraseBtn->setEnabled(true);
+    ui->eraseBtn->setEnabled(currentTargetDev == STM32_DFU);
     ui->returnBtn->setEnabled(true);
+    ui->selectTargetGB->setEnabled(true);
 }

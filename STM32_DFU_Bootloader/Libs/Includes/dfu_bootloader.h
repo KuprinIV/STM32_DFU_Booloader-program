@@ -38,6 +38,8 @@ public:
         CANT_SEND_CHECKSUM = -14,
         CANT_SAVE_FW_VERIFY_DATA = -15,
         CANT_LOCK_FLASH_READ = -16,
+        CANT_VERIFY_MD5_HASH = -17,
+        CANT_SELECT_TARGET = -18
     };
 
     enum DFU_BootloaderOperations : int
@@ -62,8 +64,12 @@ public:
     void ReadFwData(int targetIndex, QMap<int, QByteArray*>* fw_data);
     void LeaveDfuMode(void);
     /** extended bootloader functions */
+    void SelectTarget(uint8_t target_id);
     void WriteEncryptedFwData(int targetIndex, QMap<int, QByteArray*>* fw_data, uint32_t checksum);
     void LockFlashMemoryReading(void);
+    /** ESP32 firmare update functions */
+    bool BtMassEraseMemory(uint32_t start_addr, uint32_t image_size);
+    void WriteBtFwData(QMap<int, QByteArray*>* fw_data);
 
 signals:
     void sendError(ErrorCodes error_code);

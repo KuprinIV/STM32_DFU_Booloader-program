@@ -40,6 +40,7 @@ private:
     int pointer=0;
     int parsedCheckSum = 0;
     bool isError = false;
+    bool isBin = false;
 
     int numFromAsciiByte (uint8_t* b, int len);
     bool getByteSlice(QByteArray array, int  len, int pointer, uint8_t* out);

@@ -84,6 +84,9 @@ public:
     bool DFU_LockFlashRead(void);
     bool DFU_SaveVerifyData(void);
     bool DFU_SendChecksum(uint32_t checksum);
+    bool DFU_SelectTarget(uint8_t target_id);
+    bool DFU_SendBtTargetParams(uint32_t start_addr, uint32_t size);
+    bool DFU_BtVerifyMD5Hash(uint8_t *is_verified);
 
 private:
     // members
@@ -126,17 +129,20 @@ private:
      * @anchor bRequestCommand
      */
     enum bRequestCommand : int {
-        DFU_DETACH = 0x00,              /**< Команда выхода из бутлодера */
-        DFU_DNLOAD = 0x01,              /**< Команда входа в режим DNLOAD */
-        DFU_UPLOAD = 0x02,              /**< Команда входа в режим UPLOAD */
-        GET_STATUS = 0x03,              /**< Команда получения текущего состояния */
-        DFU_CLRSTATUS = 0x04,           /**< Команда удаления текущего состояния (не использовать) */
-        DFU_GETSTATE = 0x05,            /**< Команда получения набора состояний, включая предыдущую ошибку */
-        DFU_ABORT = 0x06,               /**< Команда прерывания предыдущей операции (выхода из режимов DNLOAD и UPLOAD) */
+        DFU_DETACH = 0x00,                  /**< Команда выхода из бутлодера */
+        DFU_DNLOAD = 0x01,                  /**< Команда входа в режим DNLOAD */
+        DFU_UPLOAD = 0x02,                  /**< Команда входа в режим UPLOAD */
+        GET_STATUS = 0x03,                  /**< Команда получения текущего состояния */
+        DFU_CLRSTATUS = 0x04,               /**< Команда удаления текущего состояния (не использовать) */
+        DFU_GETSTATE = 0x05,                /**< Команда получения набора состояний, включая предыдущую ошибку */
+        DFU_ABORT = 0x06,                   /**< Команда прерывания предыдущей операции (выхода из режимов DNLOAD и UPLOAD) */
         /** extended DFU requests */
-        DFU_READ_LOCK = 0x07,           /**< Команда установки защиты flash-памяти от чтения */
-        DFU_SAVE_VERIFY_DATA = 0x0A,    /**< Команда сохранения чек-суммы и параметров образа прошивки */
-        DFU_SEND_CHECKSUM = 0x0B        /**< Команда передачи чек-суммы */
+        DFU_READ_LOCK = 0x07,               /**< Команда установки защиты flash-памяти от чтения */
+        DFU_SAVE_VERIFY_DATA = 0x08,        /**< Команда сохранения чек-суммы и параметров образа прошивки */
+        DFU_SEND_CHECKSUM = 0x09,           /**< Команда передачи чек-суммы */
+        DFU_SELECT_TARGET = 0x0A,           /**< Команда для выбора прошиваемой памяти */
+        DFU_SET_BT_TARGET_PARAMS = 0x0B,    /**< Команда для передачи параметров образа прошивки ESP32 */
+        DFU_BT_VERIFY_MD5_HASH = 0x0C       /**< Команда для верификации образа памяти после загрузки */
     };
     // functions
     bool controlTransfer(uint8_t requestType, uint8_t bRequest, uint16_t wValue, uint16_t wIndex, unsigned char *data, uint16_t wLength);
